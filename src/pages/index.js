@@ -31,10 +31,7 @@ import { useQuery } from "@apollo/client";
 
 
 function ExportToFile(pairs, tokens) {
-  // exportObjectAsJson(poolDatas)
-  console.log('ExportToFile --- 1111111');
-
-  const tokenMap = new Map();
+  const tokenMap = new Map()
   tokens.forEach(token => {
     tokenMap.set(token.symbol, token.decimals);
   });
@@ -43,29 +40,29 @@ function ExportToFile(pairs, tokens) {
   pairs.forEach(pair => {
     const token0 = pair.token0;
     const token1 = pair.token1;
-    const token0Map = tokenMap.get(token0.symbol);
-    const token1Map = tokenMap.get(token1.symbol);
+    const token0Decimals = tokenMap.get(token0.symbol);
+    const token1Decimals = tokenMap.get(token1.symbol);
 
-    if (!token0Map) {
-      console.log('unrecogonized token: ' + token0);
+    if (!token0Decimals) {
+      console.log('unrecogonized token: ' + token0.symbol);
       return;
     }
 
-    if (!token1Map) {
-      console.log('unrecogonized token: ' + token1);
+    if (!token1Decimals) {
+      console.log('unrecogonized token: ' + token1.symbol);
       return;
     }
     
     const token0Update = {
       address:    token0.id,
-      decimals:   token0Map.decimals,
+      decimals:   token0Decimals,
       derivedETH: token0.derivedETH,
       name:       token0.name,
       symbol:     token0.symbol,
     };
     const token1Update = {
       address:    token1.id,
-      decimals:   token1Map.decimals,
+      decimals:   token0Decimals,
       derivedETH: token1.derivedETH,
       name:       token1.name,
       symbol:     token1.symbol,
@@ -86,8 +83,6 @@ function ExportToFile(pairs, tokens) {
   document.body.appendChild(downloadAnchorNode) // required for firefox
   downloadAnchorNode.click()
   downloadAnchorNode.remove()
-
-  console.log('ExportToFile --- 2222222');
 }
 
 

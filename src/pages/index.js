@@ -29,43 +29,50 @@ import Head from "next/head";
 import { ParentSize } from "@visx/responsive";
 import { useQuery } from "@apollo/client";
 
-
 function ExportToFile(pairs, tokens) {
-  const tokenMap = new Map()
-  tokens.forEach(token => {
-    tokenMap.set(token.symbol, token.decimals);
+  console.log("pairs length: " + pairs.length);
+  console.log("tokens length: " + tokens.length);
+  const tokenMap = new Map();
+  tokens.forEach((token) => {
+    tokenMap.set(token.id, token.decimals);
   });
 
+  console.log("FEI: " + tokenMap.get("FEI"));
+
   const jsonArray = [];
-  pairs.forEach(pair => {
+  pairs.slice(0, 202).forEach((pair) => {
     const token0 = pair.token0;
     const token1 = pair.token1;
-    const token0Decimals = tokenMap.get(token0.symbol);
-    const token1Decimals = tokenMap.get(token1.symbol);
+    const token0Decimals = tokenMap.get(token0.id);
+    const token1Decimals = tokenMap.get(token1.id);
 
     if (!token0Decimals) {
-      console.log('unrecogonized token: ' + token0.symbol);
+      console.log("token0: unrecogonized token: " + token0.symbol);
+      console.log("token0: unrecogonized token: " + token0.id);
+      console.log("token1: " + token1.symbol);
       return;
     }
 
     if (!token1Decimals) {
-      console.log('unrecogonized token: ' + token1.symbol);
+      console.log("token0: " + token0.symbol);
+      console.log("token1: unrecogonized token: " + token1.symbol);
+      console.log("token1: unrecogonized token: " + token1.id);
       return;
     }
-    
+
     const token0Update = {
-      address:    token0.id,
-      decimals:   token0Decimals,
+      address: token0.id,
+      decimals: token0Decimals,
       derivedETH: token0.derivedETH,
-      name:       token0.name,
-      symbol:     token0.symbol,
+      name: token0.name,
+      symbol: token0.symbol,
     };
     const token1Update = {
-      address:    token1.id,
-      decimals:   token0Decimals,
+      address: token1.id,
+      decimals: token1Decimals,
       derivedETH: token1.derivedETH,
-      name:       token1.name,
-      symbol:     token1.symbol,
+      name: token1.name,
+      symbol: token1.symbol,
     };
     const element = {
       poolAddress: pair.id,
@@ -76,15 +83,17 @@ function ExportToFile(pairs, tokens) {
     jsonArray.push(element);
   });
 
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(jsonArray))
-  const downloadAnchorNode = document.createElement('a')
-  downloadAnchorNode.setAttribute('href', dataStr)
-  downloadAnchorNode.setAttribute('download', 'sushi_pools.json')
-  document.body.appendChild(downloadAnchorNode) // required for firefox
-  downloadAnchorNode.click()
-  downloadAnchorNode.remove()
+  console.log("jsonArray: " + jsonArray.length);
+  const dataStr =
+    "data:text/json;charset=utf-8," +
+    encodeURIComponent(JSON.stringify(jsonArray));
+  const downloadAnchorNode = document.createElement("a");
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", "sushi_pools.json");
+  document.body.appendChild(downloadAnchorNode); // required for firefox
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
 }
-
 
 function IndexPage() {
   const {
@@ -185,7 +194,9 @@ function IndexPage() {
           </Paper>
         </Grid>
 
-        <Button color="primary" onClick={() => ExportToFile(pairs, tokens)}>Export</Button>
+        <Button color="primary" onClick={() => ExportToFile(pairs, tokens)}>
+          Export
+        </Button>
 
         <Grid item xs={12}>
           <PairTable title="Top Sushi Liquidity Pairs" pairs={pairs} />
